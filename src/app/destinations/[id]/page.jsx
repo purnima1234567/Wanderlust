@@ -1,33 +1,46 @@
+import BookingCard from "@/components/BookingCard";
 import { DeleteAlert } from "@/components/DeleteAlert";
 import { EditModal } from "@/components/EditModal";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Image from "next/image";
 import { FaRegCalendar } from "react-icons/fa";
 import { LuMapPin } from "react-icons/lu";
 
 const DestinationDetailsPage = async ({ params }) => {
-
     const { id } = await params
-
-    const res = await fetch(`http://localhost:5000/destination/${id}`)
+    const {token} = await auth.api.getToken({
+        headers: await headers()
+    })
+    
+    
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/destination/${id}`, {
+        headers: {
+            authorization: `Bearer ${token}`
+        }
+    })
     const destination = await res.json();
 
     const { imageUrl, price, destinationName, duration, country, description } = destination || {}
-    console.log(destination);
+     //console.log(destination);
+
 
 
     return (
         <div className="max-w-7xl mx-auto">
 
-           <div className="flex items-center gap-3 justify-end mb-3 mt-3">
-             <EditModal destination={destination}/>
-            <DeleteAlert destination={destination}/>
+            <div className="flex items-center gap-3 justify-end mb-3 mt-3">
+                <EditModal destination={destination} />
+                <DeleteAlert destination={destination} />
 
-           </div>
+            </div>
 
 
             <Image className="w-full h-100 object-cover" alt={destinationName} src={imageUrl} height={500} width={800} />
 
-            <div className="p-2">
+
+           <div className="flex justify-between">
+             <div className="p-2">
                 <div className="flex items-center gap-1">
                     <LuMapPin /> <span>{country}</span>
                 </div>
@@ -41,17 +54,16 @@ const DestinationDetailsPage = async ({ params }) => {
                             <FaRegCalendar />{duration}
                         </div>
                     </div>
-
-
-
-                    <div><h3 className="text-2xl font-bold">$ {price}</h3>
-                    </div>
                 </div>
 
                 <h1 className="mt-10 text-2xl font-bold">Overview</h1>
 
                 <p>{description}</p>
             </div>
+
+
+                <BookingCard destination={destination} />
+           </div>
 
         </div>
     );

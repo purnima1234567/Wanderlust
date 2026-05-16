@@ -1,7 +1,17 @@
 import DestinationCard from "@/components/DestinationCard";
 
-const DestinationPage = async() => {
-    const res = await fetch('http://localhost:5000/destination')
+const DestinationPage = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/destination`, {
+        cache: "no-store"
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch destinations");
+    }
+
+
+
+
     const destinations = await res.json()
 
     return (
@@ -10,7 +20,7 @@ const DestinationPage = async() => {
 
             <div className="grid grid-cols-4 gap-5">
                 {
-                    destinations.map(destination => <DestinationCard key={destination._id} destination={destination} />) 
+                    destinations.map(destination => <DestinationCard key={destination._id} destination={destination} />)
                 }
             </div>
         </div>
